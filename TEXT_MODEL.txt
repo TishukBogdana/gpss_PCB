@@ -1,0 +1,32 @@
+STORAGE PROKAT 2;
+STRAGE H_M 3;
+*__________________________________
+
+	GENERATE (Exponential(91,0,0.8)); онрнл лнфмн онлемърэ
+	QUEUE PROK;
+	ENTER PROKAT;
+	DEPART PROK;
+	ADVANCE (Exponential(91,0,0.1)); онлемърэ гюйнм
+	LEAVE PROKAT;
+	QUEUE QSMD;
+	SEIZE SMD;
+	DEPART QSMD;
+	ADVANCE (Exponential(91,0,0.5));
+	RELEAZE SMD;
+	TRANSFER ; кхан мю йюпсяекэ кхан б оевэ
+KARUSEL   QUEUE QKAR;
+	SEIZE KAR;
+	DEPART QKAR;
+	ADVANCE (Exponential(91,0,0.25));
+	RELEAZE KAR;
+* OVEN пюяохяюрэ йюй онякеднбюрекэмнярэ сгкнб
+OVEN      QUEUE QOV;
+	SEIZE CON_OVEN;
+	DEPART QOV;
+	ADVANCE (Exponential(91,0,0.08));
+	RELEAZE CON_OVEN;
+HAND_MOUNTING QUEUE QHM;
+	ENTER H_M;
+	DEPART QHM;
+	ADVANCE (Exponential(91,0,0.25));
+	LEAVE H_M;
