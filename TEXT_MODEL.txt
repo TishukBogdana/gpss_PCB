@@ -1,32 +1,103 @@
-STORAGE PROKAT 2;
-STRAGE H_M 3;
-*__________________________________
+PROKAT STORAGE 2;
+H_M STORAGE 2;
+T_PROK TABLE MP$A,0.1,0.1,20; рпюмгхярмне бпелъ вепег опнйюрмше сярюмнбйх
+T_SMD TABLE MP$A,0.1,0.1,20; рпюмгхрмне бпелъ вепег юбрнлюр лнмрюфю
+T_KAR TABLE MP$A,0.1,0.1,20; рпюмгхрмне бпелъ вепег йюпсяекэ
+T_HAND_MT TABLE MP$A,0.1,0.1,20; рпюмгхрмне бпелъ вепег сгек псвмнцн лнмрюфю
+T_CTRL TABLE MP$A,0.1,0.1,20; рпюгмхрмне бпелъ вепег сгек норхвеяйнцн йнмрпнкъ
+T_CTRL TABLE MP$A,0.1,0.1,20; рпюгмхрмне бпелъ вепег сгек норхвеяйнцн йнмрпнкъ
+T_TERM TABLE V$VAR,0.5,0.5,20; TERMINATE
 
-	GENERATE (Exponential(91,0,0.8)); онрнл лнфмн онлемърэ
+SAVEVALUE B_B,0;
+VAR VARIABLE AC1-X$B_B;
+
+qT_PROK QTABLE PROK,0.1,0.1,20; 
+qT_SMD QTABLE QSMD,0.1,0.1,20; 
+qT_KAR QTABLE QKAR,0.1,0.1,20;
+qT_HAND_MT QTABLE QHM,0.1,0.1,20; 
+qT_CTRL QTABLE QCONT,0.1,0.1,20; 
+*____________________________________________________________________________
+	GENERATE (Uniform(91,0.6,1.4));  дюкее гюйнмш асдср бюпэхпнбюрэяъ
+; бунд мю опнйюрмше сярюмнбйх
+	MARK  A;
 	QUEUE PROK;
 	ENTER PROKAT;
 	DEPART PROK;
-	ADVANCE (Exponential(91,0,0.1)); онлемърэ гюйнм
+	ADVANCE (Exponential(91,0,0.1));  дюкее гюйнмш асдср бюпэхпнбюрэяъ
 	LEAVE PROKAT;
+          TABULATE T_PROK;
+
+;бунд мю юбрнлюр SMD лнмрюфю
+ASMD	MARK A;
 	QUEUE QSMD;
 	SEIZE SMD;
 	DEPART QSMD;
-	ADVANCE (Exponential(91,0,0.5));
-	RELEAZE SMD;
-	TRANSFER ; кхан мю йюпсяекэ кхан б оевэ
-KARUSEL   QUEUE QKAR;
+	ADVANCE (Uniform(91,0.3,0.7)); дюкее гюйнмш асдср бюпэхпнбюрэяъ
+	RELEASE SMD;
+	TABULATE T_SMD; 
+	TRANSFER 0.8,,OVEN; кхан мю йюпсяекэ кхан б оевэ
+
+; бунд мю йюпсяекэ
+KARUSEL 	MARK A;
+  	QUEUE QKAR; 
 	SEIZE KAR;
 	DEPART QKAR;
-	ADVANCE (Exponential(91,0,0.25));
-	RELEAZE KAR;
-* OVEN пюяохяюрэ йюй онякеднбюрекэмнярэ сгкнб
-OVEN      QUEUE QOV;
-	SEIZE CON_OVEN;
-	DEPART QOV;
-	ADVANCE (Exponential(91,0,0.08));
-	RELEAZE CON_OVEN;
-HAND_MOUNTING QUEUE QHM;
+	ADVANCE (Exponential(91,0,0.25)); дюкее гюйнмш асдср бюпэхпнбюрэяъ
+	RELEASE KAR;
+	TABULATE T_KAR;
+
+
+*мю йнмбейжхнммсч оев
+* оев хлеер 4 релоепюрспмше гнмш, йюфдюъ гнмю бшдекемю нрдекэмшл опханпнл,
+* врнаш нрпюгхрэ пеюкэмсч яхрюсжхч, рюй йюй б оевх лнфер ашрэ меяйнкэйн окюр б пюгмшу гнмюу
+* бпелъ мюунфдемхъ б йюфдни гнме ндхмюйнбн
+OVEN      MARK A 
+;гнмю мюцпебю
+	QUEUE QZONE_HEATING;
+	SEIZE Z_H;
+	DEPART QZONE_HEATING;
+	ADVANCE 0.02;
+	RELEASE Z_H;
+
+;гнмю ярюахкхгюжхх
+	SEIZE Z_ST;
+	ADVANCE 0.02;
+	RELEASE Z_ST;
+
+;гнмю окюбкемхъ
+	SEIZE Z_PL;
+	ADVANCE 0.02;
+	RELEASE Z_PL;
+
+;гнмю нукюфдемхъ
+	SEIZE Z_COOL;
+	ADVANCE 0.02;
+	RELEASE Z_COOL;
+	TRANSFER 0.01,,LOST1;
+	TRANSFER 0.5,,ASMD;  
+HAND_MOUNT MARK A;
+	QUEUE QHM;
 	ENTER H_M;
 	DEPART QHM;
-	ADVANCE (Exponential(91,0,0.25));
+	ADVANCE (Exponential(91,0,0.25)+Exponential(91,0,0.25));   дюкее гюйнмш асдср бюпэхпнбюрэяъ
 	LEAVE H_M;
+	TABULATE T_HAND_MT;
+	TRANSFER 0.05,,LOST2;    
+            
+
+CONTROL   MARK A;
+	QUEUE QCONT;
+	SEIZE CTRL;
+	DEPART QCONT;
+	ADVANCE (Exponential(91,0,0.25));  дюкее гюйнмш асдср бюпэхпнбюрэяъ
+
+	RELEASE CTRL;
+	TABULATE T_CTRL;
+	TRANSFER 0.05,,HAND_MOUNT;
+
+TABULATE T_TERM;
+SAVEVALUE B_B,AC1;
+	TERMINATE 1;
+LOST1 TERMINATE 1;
+LOST2 TERMINATE 1;
+START 100000;
